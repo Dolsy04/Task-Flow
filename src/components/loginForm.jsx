@@ -55,7 +55,7 @@ export default function LoginForm(){
         e.preventDefault()
         setIsLoading(true);
         const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: "http://localhost:5173/updatepassword",
+            redirectTo: "https://task-flow-tawny.vercel.app/updatepassword",
         })
          if (error) {
             toast.error(`Reset password Error ${error.message}`)
