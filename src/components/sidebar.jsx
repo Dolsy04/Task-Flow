@@ -28,11 +28,15 @@ export default function Sidebar({isActive, onClose}){
         const { error } = await supabase.auth.signOut()
 
         if(error){
-            toast.error(`error signin out ${error.message}`,{id: toastID, duration: 4000})
+            if(error.message.includes("already") || error.message.includes("session")){
+                toast.dismiss(toastID);
+                navigate("/",{replace: true});
+            }else{
+                toast.error(`error signin out ${error.message}`,{id: toastID, duration: 4000})
+            }
         }else{
             toast.success(`signin out successfully`,{id: toastID, duration: 3000})
             navigate("/", {replace: true})
-            
         }
         setLoading(false);
     }
