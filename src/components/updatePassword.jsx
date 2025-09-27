@@ -8,6 +8,7 @@ import { supabase } from "../supabase/supabase";
 
 export default function UpdatePassword(){
     const [togglePassword, setTogglePassword] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [password, setPassword] = useState("");
     const [resetPasswordResponse, setResetPasswordResponse] = useState("");
     const navigate = useNavigate()
@@ -29,15 +30,34 @@ export default function UpdatePassword(){
 
     const passwordUpdateState = async (e) => {
        e.preventDefault();
+        setLoading(true)
 
-       if(!password){
-        toast.error("Password can't be empty");
-        return;
-       }
+        try{
+            if(!password){
+                toast.error("Password can't be empty");
+                return;
+            }
 
-       const { data, error} = await supabase.auth.updateUser({password});
+           const { data, error} = await supabase.auth.updateUser({password});
 
-       return error ? error.message.includes("Auth session missing") ? (toast.error(`Reset link expired. Request a new one`), setTimeout(()=>{navigate("/")},3000)) : (toast.error(`Error updating password ${error.message}`), setResetPasswordResponse(`Error updating password ${error.message}`)) : data ? (toast.success(`Password updated successfully. You can login now`), setResetPasswordResponse(`Password updated successfully. You can login now`), setTimeout(()=>{navigate("/")},3000)) : null;
+           if(error){
+                if(error.message.includes("Auth session missing")){
+                    toast.error(`Reset link expired. Request a new one`) 
+                    setTimeout(()=>{navigate("/")},3000) 
+                }else{
+                    toast.error(`Error updating password:  ${error.message}`), 
+                    setResetPasswordResponse(`Error updating password: ${error.message}`);
+                }
+           }else if(data){
+                toast.success(`Password updated successfully. You can login now`,{duration: 3000})
+                setResetPasswordResponse(`Password updated successfully. You can login now`)
+                setTimeout(()=>{navigate("/")},3000)
+           }
+        }catch (error){
+            toast.error("Unexpected Error Occurred", error)
+        }finally{
+            setLoading(false)
+        }
     }
     
     return (
@@ -63,8 +83,8 @@ export default function UpdatePassword(){
 
                         <p className={`text-sm font-sans font-normal mt-4 text-red-600 w-full ${resetPasswordResponse ? "block" : "hidden"}`}>{resetPasswordResponse}</p>
                         <div className="mt-8 w-full h-[40px] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-[50px] border border-white/20">
-                            <Button type="submit" className="w-full h-full text-center border border-white rounded-[50px] flex items-center justify-center text-white text-base font-sans cursor-pointer">
-                                <span>Update Password</span>
+                            <Button disabled={loading} type="submit" className={`w-full h-full text-center border border-white rounded-[50px] flex items-center justify-center text-white text-base font-sans cursor-pointer ${loading ?"cursor-not-allowed" : "cursor-pointer"}`}>
+                                <span>{loading ? "Loading..." : "Update Password"}</span>
                             </Button>
                         </div>
                     </form>
