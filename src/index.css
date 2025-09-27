@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+.scrollbar{
+    scrollbar-width: none;
+    scrollbar-color: #555555;
+}
