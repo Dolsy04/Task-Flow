@@ -80,7 +80,7 @@ export default function SignUpForm(){
         }
 
 
-        toast.success(`SignUp succesfully ${data.user.email}`, {id:toastID, duration: 4000})
+        toast.success(`Sign-up successful ${data.user.email}`, {id:toastID, duration: 4000})
         setEmail("");
         setPassword("");
         setGender("");
@@ -89,7 +89,7 @@ export default function SignUpForm(){
         setIsLoading(false);
 
         setTimeout(()=>{
-            navigate("/")
+            navigate("/emailverification", { state: {email}})
         }, 2000)
     }
 
